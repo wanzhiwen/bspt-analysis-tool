@@ -50,12 +50,50 @@ class OPEBenchmark:
             success_ret[tracker_name] = success_ret_
         return success_ret
 
+    #TODO
+    def eval_success_by_label(self, label_number, eval_trackers=None):
+        '''
+        Args:
+            eval_trackers: list of tracker name or single tracker name
+        Return:
+            dict of result
+        '''
+        if eval_trackers is None:
+            eval_trackers = self.dataset.tracker_names
+        if isinstance(eval_trackers, str):
+            eval_trackers = [eval_trackers]
+        success_ret = {}
+        for tracker_name in eval_trackers:
+            success_ret_ = {}
+            gt_label = []
+            tracker_label = []
+            for video in self.dataset:
+                gt_traj = video.gt_traj
+                label_traj = video.label
+                if tracker_name not in video.pred_trajs:#load if not load
+                    tracker_traj = video.load_tracker(self.dataset.tracker_path,
+                            tracker_name, False)
+                    #tracker_traj = np.array(tracker_traj)
+                else:
+                    tracker_traj = video.pred_trajs[tracker_name]
+                n_frame = len(gt_traj)
+                if not n_frame == len(tracker_traj) == len(label_traj):
+                    print('gt_len = %d,tracker_len = %d, label_len = %d,length not match error!!!'%(n_frame, len(tracker_traj),len(label_traj)))
+                    return
+                for i in range(n_frame):
+                    if label_traj[i][label_number] == 1:
+                        gt_label.append(gt_traj[i])
+                        tracker_label.append(tracker_traj[i])
+            success_ret[tracker_name] = success_overlap_gt8(np.array(gt_label), np.array(tracker_label), len(gt_label))
+            return success_ret
+
+
     def eval_precision(self, eval_trackers=None):
         """
         Args:
             eval_trackers: list of tracker name or single tracker name
         Return:
-            res: dict of results
+            precision_ret: dict of results
         """
         if eval_trackers is None:
             eval_trackers = self.dataset.tracker_names
@@ -81,6 +119,47 @@ class OPEBenchmark:
                         thresholds, n_frame)
             precision_ret[tracker_name] = precision_ret_
         return precision_ret
+
+
+    #TODO
+    def eval_precision_by_label(self, label_number, eval_trackers=None):
+        '''
+        Args:
+            eval_trackers: list of tracker name or single tracker name
+        Return:
+            dict of result
+        '''
+        if eval_trackers is None:
+            eval_trackers = self.dataset.tracker_names
+        if isinstance(eval_trackers, str):
+            eval_trackers = [eval_trackers]
+        precision_ret = {}
+        for tracker_name in eval_trackers:
+            gt_label = []
+            tracker_label = []
+            for video in self.dataset:
+                gt_traj = video.gt_traj
+                label_traj = video.label
+                if tracker_name not in video.pred_trajs:#load if not load
+                    tracker_traj = video.load_tracker(self.dataset.tracker_path,
+                            tracker_name, False)
+                    #tracker_traj = np.array(tracker_traj)
+                else:
+                    tracker_traj = video.pred_trajs[tracker_name]
+                n_frame = len(gt_traj)
+                if not n_frame == len(tracker_traj) == len(label_traj):
+                    print('gt_len = %d,tracker_len = %d, label_len = %d,length not match error!!!'%(n_frame, len(tracker_traj),len(label_traj)))
+                    return
+                for i in range(n_frame):
+                    if label_traj[i][label_number] == 1:
+                        gt_label.append(gt_traj[i])
+                        tracker_label.append(tracker_traj[i])
+            
+            gt_center = self.convert_bb_to_center_gt8(np.array(gt_label))#
+            tracker_center = self.convert_bb_to_center(np.array(tracker_label))
+            thresholds = np.arange(0, 51, 1)
+            precision_ret[tracker_name] = success_error(gt_center, tracker_center, thresholds, len(gt_center))
+            return precision_ret
 
     def eval_norm_precision(self, eval_trackers=None):
         """

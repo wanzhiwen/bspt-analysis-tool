@@ -20,7 +20,7 @@ def draw_success_precision(success_ret, name, videos, attr, precision_ret=None,
     thresholds = np.arange(0, 1.05, 0.05)
     for tracker_name in success_ret.keys():
         value = [v for k, v in success_ret[tracker_name].items() if k in videos]
-        success[tracker_name] = np.mean(value)
+        success[tracker_name] = np.mean(value)#use mean
     for idx, (tracker_name, auc) in  \
             enumerate(sorted(success.items(), key=lambda x:x[1], reverse=True)):
         if tracker_name == bold_name:
