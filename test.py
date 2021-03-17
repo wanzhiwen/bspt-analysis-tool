@@ -2,7 +2,7 @@ import argparse
 from glob import glob
 import os
 import numpy as np
-from sklearn.metrics import auc
+#from sklearn.metrics import auc
 from tools.database.soccer import SoccerDataset
 from tools.evaluation.opebenchmark import OPEBenchmark
 from tools.visualization.draw_precision_success import draw_success_precision
@@ -21,6 +21,9 @@ def main():
     dataset = SoccerDataset('Soccer', args.database)
     dataset.set_tracker(args.tracker_path, trackers)
     benchmark = OPEBenchmark(dataset)
+
+
+
     #dataset.videos['shot121'].load_tracker(dataset.tracker_path, 'BACF', True)
     #print(dataset.videos['shot121'].pred_trajs['BACF'])
     #print(dataset.videos['shot121'].gt_traj)
@@ -31,12 +34,6 @@ def main():
     # print(success_ret[args.tracker_prefix])
     # precision_ret = benchmark.eval_precision()
     # print(precision_ret[args.tracker_prefix])
-    
-    # draw_precision_success
-    # precision_ret = benchmark.eval_precision()
-    # success_ret = benchmark.eval_success()
-    # videos = list(dataset.videos.keys())
-    # draw_success_precision(success_ret, 'name', videos, 'ALL', precision_ret=precision_ret)
     
     # #eval by label
     # success = {}
@@ -51,11 +48,12 @@ def main():
     #     np.savetxt('./data.txt',t,delimiter=' ',newline='\n',fmt = '%.3f')
 
 
-    #eval by label2 (precision)
+    # eval by label2 (precision)
     # precision_ret = benchmark.eval_precision()
     # trackers = dataset.tracker_names
     # success = {}
     # for tracker in trackers:
+    #     print('tracker:' + tracker)
     #     videos = precision_ret[tracker]
     #     t = []
     #     auc_cal = []
@@ -67,40 +65,43 @@ def main():
     #                 results[video_name] = precision_ret[tracker][video_name]
     #                 count = count+1
     #         value = [v for k, v in results.items()]
-    #         result_mean = np.mean(value, axis = 0)
-    #         t.append(result_mean)
+    #         result = np.mean(value, axis = 0)[20]
+    #         t.append(result)
     #         print('attribute = ' + str(i) + ', num = ' + str(count))
-    #     t = np.array(t)
     #     success[tracker] = t
-    #     np.savetxt('./data.txt',t,delimiter=' ',newline='\n',fmt = '%.3f')
+    #     np.savetxt('./data.txt',t,delimiter=' ',newline='\n',fmt = '%.3f')# 只取20像素那列
 
-    #eval by label2 (success)
-    success_ret = benchmark.eval_success()
-    trackers = dataset.tracker_names
-    success = {}
-    thresholds_overlap = np.arange(0, 1.05, 0.05)
-    for tracker in trackers:
-        videos = success_ret[tracker]
-        #print('video num:' + str(len(videos)))
-        t = []
-        auc_cal = []
-        for i in range(8):#8 labels
-            count = 0
-            results = {}
-            for video_name in videos:
-                if dataset[video_name].attribute[i] == 1:
-                    results[video_name] = success_ret[tracker][video_name]
-                    count = count+1
-            value = [v for k, v in results.items()]
-            result_mean = np.mean(value, axis = 0)
-            auc_cal.append(auc(thresholds_overlap.tolist(), result_mean.tolist()))
-            print('attribute = ' + str(i) + ', num = ' + str(count))
-        auc_cal = np.array(auc_cal)
-        success[tracker] = auc_cal
-        np.savetxt('./auc.txt', auc_cal, delimiter=' ',newline='\n',fmt = '%.3f')
+    # eval by label2 (success)
+    # success_ret = benchmark.eval_success()
+    # trackers = dataset.tracker_names
+    # success = {}
+    # thresholds_overlap = np.arange(0, 1.05, 0.05)
+    # for tracker in trackers:
+    #     print('tracker:' + tracker)
+    #     videos = success_ret[tracker]
+    #     #print('video num:' + str(len(videos)))
+    #     t = []
+    #     auc_cal = []
+    #     for i in range(8):#8 labels
+    #         count = 0
+    #         results = {}
+    #         for video_name in videos:
+    #             if dataset[video_name].attribute[i] == 1:
+    #                 results[video_name] = success_ret[tracker][video_name]
+    #                 count = count+1
+    #         value = [v for k, v in results.items()]
+    #         auc_cal.append(np.mean(value))
+    #         print('attribute = ' + str(i) + ', num = ' + str(count))
+    #     success[tracker] = auc_cal
+    #     np.savetxt('./auc.txt', auc_cal, delimiter=' ',newline='\n',fmt = '%.3f')
 
+    #draw_precision_success
+    # precision_ret = benchmark.eval_precision()
+    # success_ret = benchmark.eval_success()
+    # videos = list(dataset.videos.keys())
+    # draw_success_precision(success_ret, 'name', videos, 'ALL', precision_ret=precision_ret)
 
-    # visualization
+    # video the tracking
     # video = dataset.videos['shot121']
     # video.load_img()
     # video.load_tracker(dataset.tracker_path, 'BACF', True)

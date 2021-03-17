@@ -100,9 +100,9 @@ def success_error(gt_center, result_center, thresholds, n_frame):
     if np.sum(mask) == 0:
         print('no legal gt error')
     for i in range(len(thresholds)):
-        # success[i] = np.sum(dist <= thresholds[i]) / float(n_frame) # ignore all 0 bb
         if np.sum(mask) == 0:
             success[i] = 0
         else:
             success[i] = np.sum(dist <= thresholds[i]) / float(np.sum(mask))
+            #success[i] = np.sum(dist <= thresholds[i]) / float(n_frame) # ignore all 0 bb
     return success
