@@ -15,8 +15,8 @@ class SoccerVideo(Video):
         attribute: video attribute
         label: frame attribute
     """
-    def __init__(self, name, root, video_dir, init_rect, img_names, gt_rect, absent, attribute, label, load_img=False):
-        super(SoccerVideo, self).__init__(name, root, video_dir, init_rect, img_names, gt_rect, absent, attribute, label, load_img)
+    def __init__(self, name, root, video_dir, init_rect, img_names, gt8_rect, gt4_rect, absent, attribute, label, size, load_img=False):
+        super(SoccerVideo, self).__init__(name, root, video_dir, init_rect, img_names, gt8_rect, gt4_rect, absent, attribute, label, size, load_img)
 
 class SoccerDataset(Dataset):
     def __init__(self, name, dataset_root, load_img=False):
@@ -32,8 +32,10 @@ class SoccerDataset(Dataset):
                                         meta_data[video]['video_dir'], 
                                         meta_data[video]['init_rect'], 
                                         meta_data[video]['img_names'], 
-                                        meta_data[video]['gt_rect'],
+                                        meta_data[video]['gt8_rect'],
+                                        meta_data[video]['gt4_rect'],
                                         meta_data[video]['absent'],
                                         meta_data[video]['attribute'],
                                         meta_data[video]['label'],
+                                        meta_data[video]['size'],
                                         load_img)

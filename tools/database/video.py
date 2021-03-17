@@ -7,14 +7,16 @@ import json
 from glob import glob
 
 class Video(object):
-    def __init__(self, name, root, video_dir, init_rect, img_names, gt_rect, absent, attribute, label, load_img=False):
+    def __init__(self, name, root, video_dir, init_rect, img_names, gt8_rect, gt4_rect, absent, attribute, label, size, load_img=False):
         self.name = name
         self.video_dir = video_dir
         self.init_rect = init_rect
-        self.gt_traj = gt_rect
+        self.gt8_traj = gt8_rect
+        self.gt_traj = gt4_rect
         self.absent = absent
         self.attribute = attribute
         self.label = label
+        self.size = size
         self.pred_trajs = {}
         self.img_names = [os.path.join(video_dir, x) for x in img_names]
         self.imgs = None
@@ -118,7 +120,7 @@ class Video(object):
         if len(pred_trajs) == 0 and len(self.pred_trajs) > 0:
             pred_trajs = self.pred_trajs
         for i, (roi, img) in enumerate(zip(self.gt_traj,
-                self.imgs[self.start_frame:self.end_frame+1])):
+                self.imgs[0:len(self.gt_traj)])):#start_frame and end_frame is not exist
             img = img.copy()
             if len(img.shape) == 2:
                 img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
@@ -132,9 +134,9 @@ class Video(object):
                     colors[name] = color
                 else:
                     color = colors[name]
-                img = self.draw_box(trajs[0][i], img, linewidth, color,
+                img = self.draw_box(trajs[i], img, linewidth, color,
                         name if show_name else None)
-            cv2.putText(img, str(i+self.start_frame), (5, 20),
+            cv2.putText(img, str(i), (5, 20),
                     cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (255, 255, 0), 2)
             cv2.imshow(self.name, img)
             cv2.waitKey(40)

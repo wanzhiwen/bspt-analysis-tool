@@ -63,10 +63,16 @@ def success_overlap(gt_bb, result_bb, n_frame):
     thresholds_overlap = np.arange(0, 1.05, 0.05)
     success = np.zeros(len(thresholds_overlap))
     iou = np.ones(len(gt_bb)) * (-1)
-    mask = np.sum(gt_bb[:, 2:] > 0, axis=1) == 2# check w&h > 0 
+    mask = np.sum(gt_bb[:, 2:] > 0, axis=1) == 2# check w&h > 0
+    if (np.sum(mask) == 0):
+        print('no legal gt error')
     iou[mask] = overlap_ratio(gt_bb[mask], result_bb[mask])
     for i in range(len(thresholds_overlap)):
-        success[i] = np.sum(iou > thresholds_overlap[i]) / float(n_frame)
+        if np.sum(mask) == 0:
+            success[i] = 0
+        else:
+            success[i] = np.sum(iou > thresholds_overlap[i]) / float(np.sum(mask))
+            # success[i] = np.sum(iou > thresholds_overlap[i]) / float(n_frame) # ignore all 0 bb
     return success
 
 def success_overlap_gt8(gt_bb, result_bb, n_frame):
@@ -76,16 +82,27 @@ def success_overlap_gt8(gt_bb, result_bb, n_frame):
     mask = np.sum(gt_bb[:, :] == 0, axis=1) != 8 # check all zero rows
     iou = overlap_ratio_gt8(gt_bb[mask], result_bb[mask])# cal iou of gt8
     for i in range(len(thresholds_overlap)):
-        success[i] = np.sum(iou > thresholds_overlap[i]) / float(n_frame)
+        #success[i] = np.sum(iou > thresholds_overlap[i]) / float(n_frame)# ignore all 0 bb
+        if np.sum(mask) == 0:
+            success[i] = 0
+            print('no legal gt error')
+        else:
+            success[i] = np.sum(iou > thresholds_overlap[i]) / float(np.sum(mask))
     return success
 
 def success_error(gt_center, result_center, thresholds, n_frame):
     # n_frame = len(gt_center)
     success = np.zeros(len(thresholds))
-    dist = np.ones(len(gt_center)) * (-1)
+    dist = np.ones(len(gt_center)) * (51)# -1 -> 51
     mask = np.sum(gt_center > 0, axis=1) == 2
     dist[mask] = np.sqrt(np.sum(
         np.power(gt_center[mask] - result_center[mask], 2), axis=1))
+    if np.sum(mask) == 0:
+        print('no legal gt error')
     for i in range(len(thresholds)):
-        success[i] = np.sum(dist <= thresholds[i]) / float(n_frame)
+        # success[i] = np.sum(dist <= thresholds[i]) / float(n_frame) # ignore all 0 bb
+        if np.sum(mask) == 0:
+            success[i] = 0
+        else:
+            success[i] = np.sum(dist <= thresholds[i]) / float(np.sum(mask))
     return success

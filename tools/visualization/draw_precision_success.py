@@ -12,9 +12,9 @@ def draw_success_precision(success_ret, name, videos, attr, precision_ret=None,
     plt.xlabel('Overlap threshold')
     plt.ylabel('Success rate')
     if attr == 'ALL':
-        plt.title(r'\textbf{Success plots of OPE on %s}' % (name))
+        plt.title(r'Success plots of OPE on %s' % (name))
     else:
-        plt.title(r'\textbf{Success plots of OPE - %s}' % (attr))
+        plt.title(r'Success plots of OPE - %s' % (attr))
     plt.axis([0, 1]+axis)
     success = {}
     thresholds = np.arange(0, 1.05, 0.05)
@@ -24,7 +24,7 @@ def draw_success_precision(success_ret, name, videos, attr, precision_ret=None,
     for idx, (tracker_name, auc) in  \
             enumerate(sorted(success.items(), key=lambda x:x[1], reverse=True)):
         if tracker_name == bold_name:
-            label = r"\textbf{[%.3f] %s}" % (auc, tracker_name)
+            label = r"[%.3f] %s" % (auc, tracker_name)
         else:
             label = "[%.3f] " % (auc) + tracker_name
         value = [v for k, v in success_ret[tracker_name].items() if k in videos]
@@ -49,9 +49,9 @@ def draw_success_precision(success_ret, name, videos, attr, precision_ret=None,
         plt.xlabel('Location error threshold')
         plt.ylabel('Precision')
         if attr == 'ALL':
-            plt.title(r'\textbf{Precision plots of OPE on %s}' % (name))
+            plt.title(r'Precision plots of OPE on %s' % (name))
         else:
-            plt.title(r'\textbf{Precision plots of OPE - %s}' % (attr))
+            plt.title(r'Precision plots of OPE - %s' % (attr))
         plt.axis([0, 50]+axis)
         precision = {}
         thresholds = np.arange(0, 51, 1)
@@ -61,7 +61,7 @@ def draw_success_precision(success_ret, name, videos, attr, precision_ret=None,
         for idx, (tracker_name, pre) in \
                 enumerate(sorted(precision.items(), key=lambda x:x[1], reverse=True)):
             if tracker_name == bold_name:
-                label = r"\textbf{[%.3f] %s}" % (pre, tracker_name)
+                label = r"[%.3f] %s" % (pre, tracker_name)
             else:
                 label = "[%.3f] " % (pre) + tracker_name
             value = [v for k, v in precision_ret[tracker_name].items() if k in videos]

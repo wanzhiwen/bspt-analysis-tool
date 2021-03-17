@@ -1,6 +1,6 @@
 import numpy as np
 from colorama import Style, Fore
-from ..utils.statistics import  success_overlap_gt8, success_error
+from ..utils.statistics import  success_overlap_gt8, success_overlap, success_error
 
 class OPEBenchmark:
     """
@@ -39,14 +39,13 @@ class OPEBenchmark:
             for video in self.dataset:
                 gt_traj = np.array(video.gt_traj)
                 if tracker_name not in video.pred_trajs:
-                    
                     tracker_traj = video.load_tracker(self.dataset.tracker_path,
                             tracker_name, False)
                     tracker_traj = np.array(tracker_traj)
                 else:
                     tracker_traj = np.array(video.pred_trajs[tracker_name])
                 n_frame = len(gt_traj)
-                success_ret_[video.name] = success_overlap_gt8(gt_traj, tracker_traj, n_frame)#
+                success_ret_[video.name] = success_overlap(gt_traj, tracker_traj, n_frame)#
             success_ret[tracker_name] = success_ret_
         return success_ret
 
@@ -84,7 +83,7 @@ class OPEBenchmark:
                     if label_traj[i][label_number] == 1:
                         gt_label.append(gt_traj[i])
                         tracker_label.append(tracker_traj[i])
-            success_ret[tracker_name] = success_overlap_gt8(np.array(gt_label), np.array(tracker_label), len(gt_label))
+            success_ret[tracker_name] = success_overlap(np.array(gt_label), np.array(tracker_label), len(gt_label))
             return success_ret
 
 
@@ -112,7 +111,7 @@ class OPEBenchmark:
                 else:
                     tracker_traj = np.array(video.pred_trajs[tracker_name])
                 n_frame = len(gt_traj)
-                gt_center = self.convert_bb_to_center_gt8(gt_traj)#
+                gt_center = self.convert_bb_to_center(gt_traj)
                 tracker_center = self.convert_bb_to_center(tracker_traj)
                 thresholds = np.arange(0, 51, 1)
                 precision_ret_[video.name] = success_error(gt_center, tracker_center,
@@ -155,7 +154,7 @@ class OPEBenchmark:
                         gt_label.append(gt_traj[i])
                         tracker_label.append(tracker_traj[i])
             
-            gt_center = self.convert_bb_to_center_gt8(np.array(gt_label))#
+            gt_center = self.convert_bb_to_center(np.array(gt_label))#
             tracker_center = self.convert_bb_to_center(np.array(tracker_label))
             thresholds = np.arange(0, 51, 1)
             precision_ret[tracker_name] = success_error(gt_center, tracker_center, thresholds, len(gt_center))
